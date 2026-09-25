@@ -16,7 +16,9 @@ set(VITA_APP_NAME "Vita Input Tester")
 set(VITA_TITLEID "INPT00001")
 set(VITA_VERSION "01.00")
 
-add_executable(${PROJECT_NAME} src/main.c)
+add_executable(${PROJECT_NAME} 
+src/main.c
+src/input.c)
 
 target_link_libraries(${PROJECT_NAME} 
 vita2d

@@ -4,8 +4,9 @@
 #include <psp2/display.h>
 #include <vita2d.h>
 
+#include "input.h"
+
 static int running = 1;
-static unsigned int prev_buttons = 0;
 typedef struct
 {
     const char *label;
@@ -21,39 +22,21 @@ static const ButtonInfo button_info[] = {
     {"CIRCLE", SCE_CTRL_CIRCLE},
     {"SQUARE", SCE_CTRL_SQUARE},
     {"TRIANGLE", SCE_CTRL_TRIANGLE},
-    {"L1", SCE_CTRL_L1},
-    {"R1", SCE_CTRL_R1},
-    {"L2", SCE_CTRL_L2},
-    {"R2", SCE_CTRL_R2},
+    {"LTrigger", SCE_CTRL_LTRIGGER},
+    {"RTrigger", SCE_CTRL_RTRIGGER},
+    {"SELECT", SCE_CTRL_SELECT},
+    {"START", SCE_CTRL_START},
     {NULL, 0} // Sentinel value to mark the end of the array
 };
 
-static int is_held(const SceCtrlData *pad, unsigned int button_mask)
+static void draw_stick(vita2d_pgf *font, int center_x, int center_y, unsigned char x_value, unsigned char y_value, const char *label)
 {
-    return (pad->buttons & button_mask) != 0;
-}
+    // Draw the stick position as a rectangle
+    float stick_x = center_x + (x_value - 128) * 0.5f; // Scale down for visibility
+    float stick_y = center_y + (y_value - 128) * 0.5f; // Scale down for visibility
 
-static int was_pressed(const SceCtrlData *pad, unsigned int button_mask)
-{
-    return (pad->buttons & button_mask) && !(prev_buttons & button_mask);
-}
-
-static SceCtrlData handle_input(unsigned int *pressed_buttons)
-{
-    SceCtrlData pad = {0};
-    sceCtrlPeekBufferPositive(0, &pad, 1);
-
-    *pressed_buttons = pad.buttons & ~prev_buttons; // Get newly pressed buttons
-
-    /*
-    if (is_held(&pad, SCE_CTRL_CROSS))
-    {
-        running = 0; // Exit the application when CROSS button is pressed
-    }
-    */
-
-    prev_buttons = pad.buttons;
-    return pad;
+    vita2d_draw_rectangle(stick_x - 5, stick_y - 5, 10, 10, RGBA8(255, 255, 255, 255));
+    vita2d_pgf_draw_text(font, center_x-40, center_y + 100, RGBA8(255, 255, 255, 255), 1.0f, label);
 }
 
 int main(void)
@@ -65,6 +48,7 @@ int main(void)
 
     sceCtrlSetSamplingMode(SCE_CTRL_MODE_ANALOG);
 
+    unsigned int tested_buttons = 0;
     // Main loop
     while (running)
     {
@@ -74,6 +58,9 @@ int main(void)
         // Start drawing
         vita2d_start_drawing();
         vita2d_clear_screen();
+
+        draw_stick(font, 650, 175, pad.lx, pad.ly, "Left Stick");
+        draw_stick(font, 850, 175, pad.rx, pad.ry, "Right Stick");
 
         for (size_t i = 0; i < sizeof(button_info) / sizeof(button_info[0]); i++)
         {
@@ -87,18 +74,23 @@ int main(void)
                 break; // Reached the sentinel value
             }
 
-            unsigned int cross_color = (is_held(&pad, button_info[i].mask))
-                                           ? RGBA8(255, 60, 60, 255)
-                                           : RGBA8(100, 100, 100, 255);
-
-            if (was_pressed(&pad, button_info[i].mask))
+            if (was_pressed(pressed_buttons, button_info[i].mask))
             {
-                // Handle CROSS button press event
-                // You can add any specific action you want to perform here
-                cross_color = RGBA8(60, 255, 100, 255); // Change color to green when pressed
+                tested_buttons |= button_info[i].mask;
             }
 
-            // Draw something (e.g., a simple rectangle)
+            unsigned int cross_color = RGBA8(100, 100, 100, 255);
+
+            if (tested_buttons & button_info[i].mask)
+            {
+                cross_color = RGBA8(60, 255, 60, 255);
+            }
+
+            if (is_held(&pad, button_info[i].mask))
+            {
+                cross_color = RGBA8(255, 60, 60, 255);
+            }
+
             vita2d_draw_rectangle(x, y, 36, 36, cross_color);
             vita2d_pgf_draw_text(font, x + 50, y + 20, RGBA8(255, 255, 255, 255), 1.0f, button_info[i].label);
         }
