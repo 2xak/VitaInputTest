@@ -1,0 +1,14 @@
+.vscode/
+
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+Makefile
+
+vita_input_tester
+vita_input_tester.self
+vita_input_tester.self.out
+vita_input_tester.velf
+vita_input_tester.vpk
+vita_input_tester.vpk.out
+vita_input_tester.vpk_param.sfo
