@@ -29,6 +29,7 @@ SceSysmodule_stub
 SceAppMgr_stub
 SceCommonDialog_stub
 ScePgf_stub
+SceTouch_stub
 m
 )
 
