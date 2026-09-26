@@ -1,2 +1,4 @@
 # VitaInput
-PS Vita homebrew that tests inputs
+A simply homebrew for testing buttons and touch input on the PSVita.
+
+Temp app icon is generated with AI.
