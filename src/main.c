@@ -43,7 +43,6 @@ static const ButtonInfo button_info[] = {
 // Draw functions
 static void draw_stick(vita2d_pgf *font, int center_x, int center_y, unsigned char x_value, unsigned char y_value, const char *label)
 {
-    // Draw the stick position as a rectangle
     float stick_x = center_x + (x_value - 128) * 0.25f;
     float stick_y = center_y + (y_value - 128) * 0.25f;
 
