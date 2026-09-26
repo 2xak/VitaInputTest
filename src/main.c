@@ -2,7 +2,6 @@
 #include <psp2/kernel/processmgr.h>
 #include <psp2/kernel/threadmgr.h>
 #include <psp2/display.h>
-#include <psp2/touch.h>
 #include <vita2d.h>
 
 #include "input.h"
@@ -99,8 +98,7 @@ int main(void)
         SceCtrlData pad = handle_input(&pressed_buttons);
         SceTouchData front_touch = {0};
         SceTouchData rear_touch = {0};
-        sceTouchPeek(SCE_TOUCH_PORT_FRONT, &front_touch, 1);
-        sceTouchPeek(SCE_TOUCH_PORT_BACK, &rear_touch, 1);
+        handle_touch(&front_touch, &rear_touch);
 
         // The tabs are large touch targets at the top of either view.
         for (int i = 0; i < front_touch.reportNum; i++)

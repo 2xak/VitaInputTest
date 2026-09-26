@@ -23,6 +23,19 @@ SceCtrlData handle_input(unsigned int *pressed_buttons)
     return pad;
 }
 
+void handle_touch(SceTouchData *front_touch, SceTouchData *rear_touch)
+{
+    if (front_touch != NULL)
+    {
+        sceTouchPeek(SCE_TOUCH_PORT_FRONT, front_touch, 1);
+    }
+
+    if (rear_touch != NULL)
+    {
+        sceTouchPeek(SCE_TOUCH_PORT_BACK, rear_touch, 1);
+    }
+}
+
 int is_held(const SceCtrlData *pad, unsigned int button_mask)
 {
     return (pad->buttons & button_mask) != 0;
