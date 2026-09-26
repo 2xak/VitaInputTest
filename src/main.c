@@ -7,6 +7,7 @@
 #include "input.h"
 
 static int running = 1;
+
 typedef enum
 {
     VIEW_BUTTONS,
@@ -36,9 +37,10 @@ static const ButtonInfo button_info[] = {
     {"RTrigger", SCE_CTRL_RTRIGGER, 825, 65, 800, 55},
     {"SELECT", SCE_CTRL_SELECT, 415, 435, 400, 495},
     {"START", SCE_CTRL_START, 515, 435, 505, 495},
-    {NULL, 0} // Sentinel value to mark the end of the array
+    {NULL, 0} // End of the array
 };
 
+// Draw functions
 static void draw_stick(vita2d_pgf *font, int center_x, int center_y, unsigned char x_value, unsigned char y_value, const char *label)
 {
     // Draw the stick position as a rectangle
@@ -70,7 +72,6 @@ static void draw_touch_panel(vita2d_pgf *font, const char *label, int x, int y,
 
     for (int i = 0; i < touch->reportNum; i++)
     {
-        // Vita touch coordinates use a 1920 by 1088 coordinate space.
         float marker_x = x + touch->report[i].x * (400.0f / 1920.0f);
         float marker_y = y + 15 + touch->report[i].y * (250.0f / 1088.0f);
         vita2d_draw_rectangle(marker_x - 8, marker_y - 8, 16, 16,
@@ -80,7 +81,6 @@ static void draw_touch_panel(vita2d_pgf *font, const char *label, int x, int y,
 
 int main(void)
 {
-    // Initialize Vita2D
     vita2d_init();
 
     vita2d_pgf *font = vita2d_load_default_pgf();
@@ -89,9 +89,9 @@ int main(void)
     sceTouchSetSamplingState(SCE_TOUCH_PORT_FRONT, SCE_TOUCH_SAMPLING_STATE_START);
     sceTouchSetSamplingState(SCE_TOUCH_PORT_BACK, SCE_TOUCH_SAMPLING_STATE_START);
 
-    unsigned int tested_buttons = 0; // Bitmask to track tested buttons
+    unsigned int tested_buttons = 0; // Track tested buttons
     AppView view = VIEW_BUTTONS;
-    // Main loop
+
     while (running)
     {
         unsigned int pressed_buttons = 0;
@@ -100,7 +100,7 @@ int main(void)
         SceTouchData rear_touch = {0};
         handle_touch(&front_touch, &rear_touch);
 
-        // The tabs are large touch targets at the top of either view.
+        // Switch view between buttons and touch
         for (int i = 0; i < front_touch.reportNum; i++)
         {
             int tx = front_touch.report[i].x * 960 / 1920;
@@ -114,7 +114,6 @@ int main(void)
             }
         }
 
-        // Start drawing
         vita2d_start_drawing();
         vita2d_clear_screen();
 
@@ -155,7 +154,6 @@ int main(void)
             draw_touch_panel(font, "Rear touch panel", 505, 125, &rear_touch);
         }
 
-        // End drawing and swap buffers
         vita2d_end_drawing();
         vita2d_swap_buffers();
     }
